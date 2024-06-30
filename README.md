@@ -64,13 +64,7 @@ FIRST_SUPERUSER_EMAIL=mail@mail.ru
 FIRST_SUPERUSER_PASSWORD=123
 ```
 
-#### Создайте миграцию
-
-```
-alembic revision --autogenerate -m "Message"
-```
-
-#### Примените миграций
+#### Примените миграции
 ```
 alembic upgrade head
 ```
@@ -80,9 +74,10 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-#### После запуска проект будет доступен по адресу: http://127.0.0.1:8000
+#### После запуска проект будет доступен по [адресу](http://127.0.0.1:8000)
 
-Документация к API досупна в следующих форматах и адресах:
 
-- Swagger: http://127.0.0.1:8000/docs
-- Redoc: http://127.0.0.1:8000/redoc
+#### Документация к API досупна в форматах:
+
+- [Swagger](http://127.0.0.1:8000/docs)
+- [Redoc](http://127.0.0.1:8000/redoc)

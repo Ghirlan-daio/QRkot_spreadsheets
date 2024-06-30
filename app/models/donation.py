@@ -11,3 +11,6 @@ class Donation(CharityDonation):
         name="fk_donation_user_id_user"
     )
     comment = Column(Text)
+
+    def __repr__(self):
+        return super(Donation, self).__repr__()

@@ -1,10 +1,11 @@
-from typing import Optional
+from datetime import datetime
+from typing import Optional, List
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import select
+from sqlalchemy import false, select
 
 from app.core.db import AsyncSession
-from app.models import User
+from app.models import CharityDonation, User
 
 
 class CRUDBase:
@@ -56,3 +57,20 @@ class CRUDBase:
         await session.delete(db_obj)
         await session.commit()
         return db_obj
+
+    async def close_obj(obj: CharityDonation) -> None:
+        """Закрывает благотворительный проект или пожертвование."""
+        obj.fully_invested = True
+        obj.close_date = datetime.now()
+
+    async def get_all_open_obj(
+            model: CharityDonation,
+            session: AsyncSession,
+    ) -> List[CharityDonation]:
+        """Получает все открытые благ. проекты или пожертвования."""
+        objects = await session.execute(
+            select(model).where(
+                model.fully_invested == false()
+            ).order_by(model.create_date)
+        )
+        return objects.scalars().all()

@@ -19,7 +19,11 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
         service.spreadsheets.create(json=SPREADSHEET_BODY)
     )
     spreadsheet_id = response["spreadsheetId"]
-    return spreadsheet_id
+    spreadsheet_url = response["spreadsheetUrl"]
+    return {
+        "spreadsheet_id": spreadsheet_id,
+        "spreadsheet_url": spreadsheet_url
+    }
 
 
 async def set_user_permissions(
@@ -48,35 +52,39 @@ async def spreadsheets_update_value(
     """Заполняет документ данными."""
     now_date_time = datetime.now().strftime(FORMAT)
     service = await wrapper_services.discover("sheets", "v4")
-    table_values = TABLE_VALUES_DRAFT.copy()
-    table_values[0].append(now_date_time)
-    table_values = [*table_values,
-                    *[list(map(str,
-                               [project.name,
-                                project.close_date - project.create_date,
-                                project.description])) for project in
-                      charity_project]
-                    ]
+    table = TABLE_VALUES_DRAFT.copy()
+    table[0].append(now_date_time)
+    table = [
+        *table,
+        *[
+            list(map(str, [
+                project.name,
+                project.close_date - project.create_date,
+                project.description
+            ]))
+            for project in charity_project
+        ]
+    ]
     update_body = {
         "majorDimension": "ROWS",
-        "values": table_values
+        "values": table
     }
 
-    columns_value = max(len(items_to_count)
-                        for items_to_count in table_values)
-    rows_value = len(table_values)
-    if (SPREADSHEET_ROWCOUNT_DRAFT < rows_value or
-            SPREADSHEET_COLUMNCOUNT_DRAFT < columns_value):
+    columns = max(map(len, table))
+    rows = len(table)
+    if (
+        SPREADSHEET_ROWCOUNT_DRAFT < rows or
+        SPREADSHEET_COLUMNCOUNT_DRAFT < columns
+    ):  # flake8 ругается, если убрать сдвиг
         raise ValueError(ROW_COLUMN_COUNT_TOO_BIG.format(
-            rows_value=rows_value,
-            columns_value=columns_value,
-            rowcount_draft=SPREADSHEET_ROWCOUNT_DRAFT,
-            columncount_draft=SPREADSHEET_COLUMNCOUNT_DRAFT))
+            rows_value=rows,
+            columns_value=columns
+        ))
 
     await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range=f"R1C1:R{rows_value}C{columns_value}",
+            range=f"R1C1:R{rows}C{columns}",
             valueInputOption="USER_ENTERED",
             json=update_body
         )
