@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.validators import check_google_api_set
-from app.constants import GOOGLE_SHEETS_URL
 from app.core.config import settings
 from app.core.db import get_async_session
 from app.core.google_client import get_service

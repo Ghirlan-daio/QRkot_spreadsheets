@@ -14,7 +14,7 @@ def allocate_donation_between_funds(
     for source in sources:
         amount = source.full_amount - source.invested_amount
         invested_amount = min(amount, amount_invest)
-        source.invested_amount += invested_amount 
+        source.invested_amount += invested_amount
         target.invested_amount += invested_amount
         amount_invest -= invested_amount
 

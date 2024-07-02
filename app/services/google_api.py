@@ -90,3 +90,10 @@ async def spreadsheets_update_value(
         )
     )
     return spreadsheet_id
+
+
+def sorted_charity_project(projects):
+    return sorted(
+        projects,
+        key=lambda obj: obj.close_date - obj.create_date
+    )

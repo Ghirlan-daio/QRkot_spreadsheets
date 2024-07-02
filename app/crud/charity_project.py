@@ -5,6 +5,7 @@ from sqlalchemy import select
 from app.core.db import AsyncSession
 from app.crud.base import CRUDBase
 from app.models import CharityProject
+from app.services.google_api import sorted_charity_project
 
 
 class CRUDCharityProject(CRUDBase):
@@ -31,10 +32,8 @@ class CRUDCharityProject(CRUDBase):
                 CharityProject.fully_invested
             )
         )
-        return sorted(
-            projects.scalars().all(),
-            key=lambda obj: obj.close_date - obj.create_date
-        )
+        sorted_projects = sorted_charity_project(projects.scalars().all())
+        return sorted_projects
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)
