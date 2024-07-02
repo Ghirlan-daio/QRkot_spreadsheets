@@ -56,7 +56,7 @@ async def check_charity_project_before_delete(
     return charity_project
 
 
-async def check_charity_project_closed(project: CharityProject) -> None:
+def check_charity_project_closed(project: CharityProject) -> None:
     """Проверяет закрытие благотворительного проекта."""
     if project.fully_invested:
         raise HTTPException(
@@ -81,7 +81,7 @@ async def check_correct_full_amount_for_update(
         )
 
 
-async def check_google_api_set(settings: Settings):
+def check_google_api_set(settings: Settings):
     """Проверка параметров Google API."""
     if not all([settings.type,
                 settings.project_id,

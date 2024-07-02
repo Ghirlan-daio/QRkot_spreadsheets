@@ -5,7 +5,8 @@ from app.constants import EXCLUDE_FIELDS
 from app.core.db import get_async_session
 from app.core.user import current_superuser, current_user
 from app.crud import donation_crud
-from app.models import User
+from app.crud.base import CRUDBase
+from app.models import CharityProject, User
 from app.schemas import DonationCreate, DonationDB
 from app.services.donation_utils import allocate_donation_between_funds
 
@@ -40,7 +41,10 @@ async def create_donation(
     new_donation = await donation_crud.create(
         donation_in, session, user
     )
-    await allocate_donation_between_funds(new_donation, session)
+    free_projects = await CRUDBase.get_all_open_obj(CharityProject, session=session)
+    if free_projects:
+        allocate_donation_between_funds(new_donation, sources=free_projects)
+        await session.commit()
     await session.refresh(new_donation)
     return new_donation
 

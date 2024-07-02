@@ -1,6 +1,6 @@
 import datetime as dt
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, CheckConstraint
+from sqlalchemy import Boolean, CheckConstraint, Column, DateTime, Integer
 
 from app.constants import ZERO_CHARITY_AMOUNT
 from app.core.db import Base
@@ -16,7 +16,7 @@ class CharityDonation(Base):
     create_date = Column(DateTime, default=dt.datetime.utcnow)
     close_date = Column(DateTime)
     __table_args__ = (
-        CheckConstraint("full_amount > ZERO_CHARITY_AMOUNT",
+        CheckConstraint(f"full_amount > {ZERO_CHARITY_AMOUNT}",
                         name="check_full_amount_positive"),
         CheckConstraint("invested_amount <= full_amount",
                         name="check_invested_amount_not_exceed")

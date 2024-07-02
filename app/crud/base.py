@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional, Union
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import false, select
@@ -29,15 +29,17 @@ class CRUDBase:
             self,
             obj_in,
             session: AsyncSession,
-            user: Optional[User] = None
+            user: Optional[User] = None,
+            commit_flag: Optional[bool] = True
     ):
         obj_in_data = obj_in.dict()
         if user is not None:
             obj_in_data["user_id"] = user.id
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
-        await session.commit()
-        await session.refresh(db_obj)
+        if commit_flag:
+            await session.commit()
+            await session.refresh(db_obj)
         return db_obj
 
     async def update(self, db_obj, obj_in, session: AsyncSession):
@@ -58,7 +60,7 @@ class CRUDBase:
         await session.commit()
         return db_obj
 
-    async def close_obj(obj: CharityDonation) -> None:
+    def close_obj(obj: CharityDonation) -> None:
         """Закрывает благотворительный проект или пожертвование."""
         obj.fully_invested = True
         obj.close_date = datetime.now()
