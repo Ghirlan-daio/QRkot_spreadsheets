@@ -50,11 +50,12 @@ async def create_charity_project(
     new_charity_project = await charity_project_crud.create(
         charity_project, session
     )
-    free_donations = await CRUDBase.get_all_open_obj(Donation, session=session)
-    if free_donations:
-        allocate_donation_between_funds(new_charity_project,
-                                        sources=free_donations)
-        await session.commit()
+    update_donations = allocate_donation_between_funds(
+        new_charity_project,
+        sources=await CRUDBase.get_all_open_obj(Donation, session=session)
+    )
+    session.add_all(update_donations)
+    await session.commit()
     await session.refresh(new_charity_project)
     return new_charity_project
 
@@ -110,9 +111,11 @@ async def partially_update_charity_project(
     charity_project = await charity_project_crud.update(
         charity_project, object_in, session
     )
-    free_donations = await CRUDBase.get_all_open_obj(Donation, session=session)
-    if free_donations:
-        allocate_donation_between_funds(charity_project,
-                                        sources=free_donations)
-        session.commit()
+    update_donations = allocate_donation_between_funds(
+        charity_project,
+        sources=await CRUDBase.get_all_open_obj(Donation, session=session)
+    )
+    session.add_all(update_donations)
+    await session.commit()
+    await session.refresh(charity_project)
     return charity_project

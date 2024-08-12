@@ -1,16 +1,16 @@
-"""ADD db
+"""ADD donation
 
-Revision ID: b49293bcc750
+Revision ID: 2dd388abf4c4
 Revises: 
-Create Date: 2024-07-02 21:34:33.067859
+Create Date: 2024-07-03 22:46:24.829640
 
 """
+from alembic import op
 import sqlalchemy as sa
 
-from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = 'b49293bcc750'
+revision = '2dd388abf4c4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,6 +29,7 @@ def upgrade():
     sa.Column('description', sa.Text(), nullable=False),
     sa.CheckConstraint('full_amount > 0', name='check_full_amount_positive'),
     sa.CheckConstraint('invested_amount <= full_amount', name='check_invested_amount_not_exceed'),
+    sa.CheckConstraint('invested_amount >= 0', name='check_invested_amount_positive'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
@@ -55,6 +56,7 @@ def upgrade():
     sa.Column('comment', sa.Text(), nullable=True),
     sa.CheckConstraint('full_amount > 0', name='check_full_amount_positive'),
     sa.CheckConstraint('invested_amount <= full_amount', name='check_invested_amount_not_exceed'),
+    sa.CheckConstraint('invested_amount >= 0', name='check_invested_amount_positive'),
     sa.ForeignKeyConstraint(['fk_donation_user_id_user'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

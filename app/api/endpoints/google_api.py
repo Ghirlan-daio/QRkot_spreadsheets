@@ -22,9 +22,13 @@ async def get_report(
     """Отчётность по закрытым проектам. Доступно только суперпользователям."""
     await check_google_api_set(settings=settings)
     projects = await charity_project_crud.get_the_end_projects(session)
+    sorted_projects = sorted(
+        projects,
+        key=lambda obj: obj.close_date - obj.create_date
+    )
     data = await spreadsheets_create(aiogoogle_object)
-    spreadsheet_url = data["spreadsheet_url"]
-    spreadsheet_id = data["spreadsheet_id"]
+    spreadsheet_id, spreadsheet_url = data
     await set_user_permissions(spreadsheet_id, aiogoogle_object)
-    await spreadsheets_update_value(spreadsheet_id, projects, aiogoogle_object)
-    return {"url": f"{spreadsheet_url}{spreadsheet_url}"}
+    await spreadsheets_update_value(spreadsheet_id, sorted_projects,
+                                    aiogoogle_object)
+    return {"url": spreadsheet_url + spreadsheet_id}

@@ -41,11 +41,13 @@ async def create_donation(
     new_donation = await donation_crud.create(
         donation_in, session, user
     )
-    free_projects = await CRUDBase.get_all_open_obj(CharityProject,
-                                                    session=session)
-    if free_projects:
-        allocate_donation_between_funds(new_donation, sources=free_projects)
-        await session.commit()
+    update_projects = allocate_donation_between_funds(
+        new_donation,
+        sources=await CRUDBase.get_all_open_obj(CharityProject,
+                                                session=session)
+    )
+    session.add_all(update_projects)
+    await session.commit()
     await session.refresh(new_donation)
     return new_donation
 

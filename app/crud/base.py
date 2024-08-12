@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Optional
 
 from fastapi.encoders import jsonable_encoder
@@ -42,7 +41,13 @@ class CRUDBase:
             await session.refresh(db_obj)
         return db_obj
 
-    async def update(self, db_obj, obj_in, session: AsyncSession):
+    async def update(
+            self,
+            db_obj,
+            obj_in,
+            session: AsyncSession,
+            commit_flag: Optional[bool] = True
+    ):
         obj_data = jsonable_encoder(db_obj)
         update_data = obj_in.dict(exclude_unset=True)
 
@@ -51,19 +56,15 @@ class CRUDBase:
                 setattr(db_obj, field, update_data[field])
 
         session.add(db_obj)
-        await session.commit()
-        await session.refresh(db_obj)
+        if commit_flag:
+            await session.commit()
+            await session.refresh(db_obj)
         return db_obj
 
     async def delete(self, db_obj, session: AsyncSession):
         await session.delete(db_obj)
         await session.commit()
         return db_obj
-
-    def close_obj(obj: CharityDonation) -> None:
-        """Закрывает благотворительный проект или пожертвование."""
-        obj.fully_invested = True
-        obj.close_date = datetime.now()
 
     async def get_all_open_obj(
             model: CharityDonation,

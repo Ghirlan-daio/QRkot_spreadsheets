@@ -18,12 +18,7 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=SPREADSHEET_BODY)
     )
-    spreadsheet_id = response["spreadsheetId"]
-    spreadsheet_url = response["spreadsheetUrl"]
-    return {
-        "spreadsheet_id": spreadsheet_id,
-        "spreadsheet_url": spreadsheet_url
-    }
+    return (response["spreadsheetId"], response["spreadsheetUrl"])
 
 
 async def set_user_permissions(
@@ -90,10 +85,3 @@ async def spreadsheets_update_value(
         )
     )
     return spreadsheet_id
-
-
-def sorted_charity_project(projects):
-    return sorted(
-        projects,
-        key=lambda obj: obj.close_date - obj.create_date
-    )
