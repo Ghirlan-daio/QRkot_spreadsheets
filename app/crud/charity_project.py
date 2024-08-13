@@ -26,13 +26,11 @@ class CRUDCharityProject(CRUDBase):
             session: AsyncSession,
     ) -> List[CharityProject]:
         """Получает завершённые проекты."""
-        projects = await session.execute(
+        return await session.execute(
             select(CharityProject).where(
                 CharityProject.fully_invested
             )
-        )
-        projects = projects.scalars().all()
-        return projects
+        ).scalars().all()
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)

@@ -20,8 +20,8 @@ class CharityDonation(Base):
                         name="check_full_amount_positive"),
         CheckConstraint("invested_amount <= full_amount",
                         name="check_invested_amount_not_exceed"),
-        CheckConstraint(f"invested_amount >= {ZERO_CHARITY_AMOUNT}",
-                        name="check_invested_amount_positive"),
+        CheckConstraint(f"{ZERO_CHARITY_AMOUNT} <= invested_amount "
+                        f"<= full_amount", name="check_invest_amt_positive"),
     )
 
     def __repr__(self):

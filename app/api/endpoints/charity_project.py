@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -111,11 +113,17 @@ async def partially_update_charity_project(
     charity_project = await charity_project_crud.update(
         charity_project, object_in, session
     )
-    update_donations = allocate_donation_between_funds(
-        charity_project,
-        sources=await CRUDBase.get_all_open_obj(Donation, session=session)
-    )
-    session.add_all(update_donations)
+
+    if charity_project.full_amount == charity_project.invested_amount:
+        charity_project.fully_invested = True
+        charity_project.close_date = datetime.now()
+        session.add(charity_project)
+    else:
+        update_donations = allocate_donation_between_funds(
+            charity_project,
+            sources=await CRUDBase.get_all_open_obj(Donation, session=session)
+        )
+        session.add_all(update_donations)
     await session.commit()
     await session.refresh(charity_project)
     return charity_project

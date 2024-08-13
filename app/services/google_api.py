@@ -16,7 +16,7 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     spreadsheets_body = SPREADSHEET_BODY.copy()
     spreadsheets_body["properties"]["title"] += date_time
     response = await wrapper_services.as_service_account(
-        service.spreadsheets.create(json=SPREADSHEET_BODY)
+        service.spreadsheets.create(json=spreadsheets_body)
     )
     return (response["spreadsheetId"], response["spreadsheetUrl"])
 
@@ -45,6 +45,10 @@ async def spreadsheets_update_value(
         wrapper_services: Aiogoogle
 ) -> str:
     """Заполняет документ данными."""
+    sorted_projects = sorted(
+        charity_project,
+        key=lambda obj: obj.close_date - obj.create_date
+    )
     now_date_time = datetime.now().strftime(FORMAT)
     service = await wrapper_services.discover("sheets", "v4")
     table = TABLE_VALUES_DRAFT.copy()
@@ -57,7 +61,7 @@ async def spreadsheets_update_value(
                 project.close_date - project.create_date,
                 project.description
             ]))
-            for project in charity_project
+            for project in sorted_projects
         ]
     ]
     update_body = {

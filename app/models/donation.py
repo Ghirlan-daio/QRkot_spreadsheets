@@ -13,5 +13,5 @@ class Donation(CharityDonation):
     comment = Column(Text)
 
     def __repr__(self):
-        base_repr = super(Donation, self).__repr__()
-        return f"{base_repr}, user_id={self.user_id}, comment={self.comment}"
+        return (f"{super().__repr__()}, user_id={self.user_id}, "
+                f"comment={self.comment}")

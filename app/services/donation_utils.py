@@ -12,18 +12,15 @@ def allocate_donation_between_funds(
     update_sources = []
     for source in sources:
         amount = source.full_amount - source.invested_amount
-        invested_amount = min(amount, target.full_amount)
-        source.invested_amount += invested_amount
-        target.invested_amount += invested_amount
+        invested_amount = min(
+            amount, (target.full_amount - target.invested_amount)
+        )
 
         for obj in [source, target]:
+            obj.invested_amount += invested_amount
             if obj.full_amount == obj.invested_amount:
                 obj.fully_invested = True
                 obj.close_date = datetime.now()
 
         update_sources.append(source)
-
-        if target.full_amount == target.invested_amount:
-            break
-
     return update_sources
