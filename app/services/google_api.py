@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime
 
 from aiogoogle import Aiogoogle
@@ -13,7 +14,7 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     """Создаёт документ."""
     date_time = datetime.now().strftime(FORMAT)
     service = await wrapper_services.discover("sheets", "v4")
-    spreadsheets_body = SPREADSHEET_BODY.copy()
+    spreadsheets_body = copy.deepcopy(SPREADSHEET_BODY)
     spreadsheets_body["properties"]["title"] += date_time
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheets_body)
@@ -51,7 +52,7 @@ async def spreadsheets_update_value(
     )
     now_date_time = datetime.now().strftime(FORMAT)
     service = await wrapper_services.discover("sheets", "v4")
-    table = TABLE_VALUES_DRAFT.copy()
+    table = copy.deepcopy(TABLE_VALUES_DRAFT)
     table[0].append(now_date_time)
     table = [
         *table,
@@ -74,7 +75,7 @@ async def spreadsheets_update_value(
     if (
         SPREADSHEET_ROWCOUNT_DRAFT < rows or
         SPREADSHEET_COLUMNCOUNT_DRAFT < columns
-    ):  # flake8 ругается, если убрать сдвиг
+    ):
         raise ValueError(ROW_COLUMN_COUNT_TOO_BIG.format(
             rows_value=rows,
             columns_value=columns
